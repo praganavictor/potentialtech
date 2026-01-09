@@ -1,26 +1,28 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { GetLogsDto } from './dto/get-logs.dto';
+import { AuditLogsResponseDto } from '../common/dto/audit-logs-response.dto';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class AuditService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async log(userId: number, action: string, resource: string, metadata?: any) {
+  async log(userId: number, action: string, resource: string, metadata?: Record<string, unknown>) {
     return this.prisma.auditLog.create({
       data: {
         userId,
         action,
         resource,
-        metadata: metadata || {},
+        metadata: (metadata || {}) as Prisma.InputJsonValue,
       },
     });
   }
 
-  async getLogs(filters: GetLogsDto) {
+  async getLogs(filters: GetLogsDto): Promise<AuditLogsResponseDto> {
     const { userId, action, dateFrom, dateTo, page = 1, limit = 50 } = filters;
 
-    const where: any = {};
+    const where: Prisma.AuditLogWhereInput = {};
 
     if (userId) {
       where.userId = userId;
@@ -62,7 +64,10 @@ export class AuditService {
     ]);
 
     return {
-      data: logs,
+      data: logs.map(log => ({
+        ...log,
+        metadata: log.metadata as Record<string, unknown>,
+      })),
       meta: {
         total,
         page,

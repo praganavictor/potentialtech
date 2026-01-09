@@ -6,6 +6,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { UserPayloadDto } from '../auth/dto/user-payload.dto';
 
 @ApiTags('users')
 @ApiBearerAuth()
@@ -19,7 +20,7 @@ export class UsersController {
   @ApiResponse({ status: 200, description: 'Usuário encontrado' })
   @ApiResponse({ status: 401, description: 'Não autorizado' })
   @ApiResponse({ status: 404, description: 'Usuário não encontrado' })
-  findMe(@CurrentUser() user: any) {
+  findMe(@CurrentUser() user: UserPayloadDto) {
     return this.usersService.findOne(user.userId);
   }
 
@@ -43,7 +44,7 @@ export class UsersController {
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateUserDto: UpdateUserDto,
-    @CurrentUser() user: any,
+    @CurrentUser() user: UserPayloadDto,
   ) {
     if (user.role !== 'ADMIN' && user.userId !== id) {
       throw new ForbiddenException('You can only update your own profile');

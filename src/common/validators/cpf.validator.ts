@@ -8,7 +8,7 @@ export const IsCPF = (validationOptions?: ValidationOptions) => {
       propertyName: propertyName,
       options: validationOptions,
       validator: {
-        validate(value: any, args: ValidationArguments) {
+        validate(value: unknown, args: ValidationArguments) {
           if (typeof value !== 'string' || value.length !== 11) {
             return false;
           }

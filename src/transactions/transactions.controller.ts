@@ -9,6 +9,7 @@ import { DepositDto } from './dto/deposit.dto';
 import { WithdrawDto } from './dto/withdraw.dto';
 import { InternalTransferDto } from './dto/internal-transfer.dto';
 import { ExternalTransferDto } from './dto/external-transfer.dto';
+import { UserPayloadDto } from '../auth/dto/user-payload.dto';
 
 @ApiTags('transactions')
 @ApiBearerAuth()
@@ -23,7 +24,7 @@ export class TransactionsController {
   @ApiResponse({ status: 400, description: 'Dados inválidos' })
   @ApiResponse({ status: 401, description: 'Não autorizado' })
   @ApiResponse({ status: 404, description: 'Conta não encontrada' })
-  deposit(@CurrentUser() user: any, @Body() depositDto: DepositDto) {
+  deposit(@CurrentUser() user: UserPayloadDto, @Body() depositDto: DepositDto) {
     return this.transactionsService.deposit(user.userId, depositDto);
   }
 
@@ -34,7 +35,7 @@ export class TransactionsController {
   @ApiResponse({ status: 401, description: 'Não autorizado' })
   @ApiResponse({ status: 403, description: 'Conta bloqueada' })
   @ApiResponse({ status: 404, description: 'Conta não encontrada' })
-  withdraw(@CurrentUser() user: any, @Body() withdrawDto: WithdrawDto) {
+  withdraw(@CurrentUser() user: UserPayloadDto, @Body() withdrawDto: WithdrawDto) {
     return this.transactionsService.withdraw(user.userId, withdrawDto);
   }
 
@@ -45,7 +46,7 @@ export class TransactionsController {
   @ApiResponse({ status: 401, description: 'Não autorizado' })
   @ApiResponse({ status: 403, description: 'Conta bloqueada' })
   @ApiResponse({ status: 404, description: 'Conta não encontrada' })
-  internalTransfer(@CurrentUser() user: any, @Body() transferDto: InternalTransferDto) {
+  internalTransfer(@CurrentUser() user: UserPayloadDto, @Body() transferDto: InternalTransferDto) {
     return this.transactionsService.internalTransfer(user.userId, transferDto);
   }
 
@@ -56,7 +57,7 @@ export class TransactionsController {
   @ApiResponse({ status: 401, description: 'Não autorizado' })
   @ApiResponse({ status: 403, description: 'Conta bloqueada' })
   @ApiResponse({ status: 404, description: 'Conta não encontrada' })
-  externalTransfer(@CurrentUser() user: any, @Body() transferDto: ExternalTransferDto) {
+  externalTransfer(@CurrentUser() user: UserPayloadDto, @Body() transferDto: ExternalTransferDto) {
     return this.transactionsService.externalTransfer(user.userId, transferDto);
   }
 
@@ -65,7 +66,7 @@ export class TransactionsController {
   @ApiResponse({ status: 200, description: 'Histórico recuperado com sucesso' })
   @ApiResponse({ status: 401, description: 'Não autorizado' })
   getHistory(
-    @CurrentUser() user: any,
+    @CurrentUser() user: UserPayloadDto,
     @Query('page', ParseIntPipe) page: number = 1,
     @Query('limit', ParseIntPipe) limit: number = 50,
   ) {

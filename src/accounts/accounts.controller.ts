@@ -5,6 +5,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { UserPayloadDto } from '../auth/dto/user-payload.dto';
 
 @ApiTags('accounts')
 @ApiBearerAuth()
@@ -18,7 +19,7 @@ export class AccountsController {
   @ApiResponse({ status: 200, description: 'Conta encontrada' })
   @ApiResponse({ status: 401, description: 'Não autorizado' })
   @ApiResponse({ status: 404, description: 'Conta não encontrada' })
-  findMyAccount(@CurrentUser() user: any) {
+  findMyAccount(@CurrentUser() user: UserPayloadDto) {
     return this.accountsService.findByUserId(user.userId);
   }
 

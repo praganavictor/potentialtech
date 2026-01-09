@@ -24,7 +24,7 @@ export class BrasilApiService {
       const response = await firstValueFrom(response$);
 
       return {
-        code: response.data.code,
+        code: String(response.data.code),
         name: response.data.name,
       };
     } catch (error) {
