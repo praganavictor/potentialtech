@@ -1,0 +1,84 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum AccountStatus {
+  ACTIVE
+  BLOCKED
+}
+
+enum TransactionType {
+  DEPOSIT
+  WITHDRAWAL
+  INTERNAL_TRANSFER
+  EXTERNAL_TRANSFER
+}
+
+model User {
+  id        Int        @id @default(autoincrement())
+  name      String
+  email     String     @unique
+  password  String
+  cpf       String     @unique
+  role      UserRole   @default(USER)
+  createdAt DateTime   @default(now())
+  account   Account?
+  auditLogs AuditLog[]
+
+  @@map("users")
+}
+
+model Account {
+  id                        Int           @id @default(autoincrement())
+  userId                    Int           @unique
+  accountNumber             String        @unique
+  balance                   Decimal       @default(0) @db.Decimal(15, 2)
+  status                    AccountStatus @default(ACTIVE)
+  createdAt                 DateTime      @default(now())
+  user                      User          @relation(fields: [userId], references: [id])
+  transactionsAsSource      Transaction[] @relation("SourceAccount")
+  transactionsAsDestination Transaction[] @relation("DestinationAccount")
+
+  @@map("accounts")
+}
+
+model Transaction {
+  id                   Int             @id @default(autoincrement())
+  type                 TransactionType
+  amount               Decimal         @db.Decimal(15, 2)
+  sourceAccountId      Int?
+  destinationAccountId Int?
+  externalBankCode     String?
+  externalBankName     String?
+  externalAgency       String?
+  externalAccount      String?
+  externalCpf          String?
+  balanceAfter         Decimal         @db.Decimal(15, 2)
+  createdAt            DateTime        @default(now())
+  sourceAccount        Account?        @relation("SourceAccount", fields: [sourceAccountId], references: [id])
+  destinationAccount   Account?        @relation("DestinationAccount", fields: [destinationAccountId], references: [id])
+
+  @@map("transactions")
+}
+
+model AuditLog {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  action    String
+  resource  String
+  metadata  Json?
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@map("audit_logs")
+}
